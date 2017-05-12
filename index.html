@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>レーダーチャート</title>
+
+  <script type="text/javascript">
+  function showRectangle(r) {
+    const canvas = document.getElementById('challenge');
+    if (canvas.getContext) {
+      x = Math.floor(Math.random()* 12) +3;
+
+      const rates = []
+
+      for (let i = 0; i < x; i++) {
+        rates.push(Math.random())
+      }
+
+      const points = getRectanglePoints(rates.length, r);
+      const half_points = getRectanglePoints(rates.length, r/2);
+
+      const context = canvas.getContext('2d');
+      context.globalAlpha = 0.3;
+      for (let i = 0; i < rates.length; i++) {
+        context.beginPath();
+        context.moveTo(300, 300);
+        context.lineTo(points[i].x + 300, points[i].y + 300);
+        context.fillStyle = '#CCCCCC';
+        context.stroke();
+        context.fill();
+      }
+
+      renderChart(points, 'black');
+      renderChart(half_points, 'black');
+
+      context.globalAlpha = 1;
+      for (let i = 0; i < 3; i++) {
+        const rates = []
+        for (let i = 0; i < x; i++) {
+          rates.push(Math.random())
+        }
+        const chartPoints = getRaderChartPoints(r, rates);
+        renderChart(chartPoints, `rgb(${255 - i * 80} , ${Math.floor(Math.random()* 255)}, ${i * 80})`);
+      }
+    }
+  }
+
+  function renderChart(points, color) {
+    const canvas = document.getElementById('challenge');
+    const context = canvas.getContext('2d');
+    context.beginPath();
+
+    context.strokeStyle = `${color}`;
+
+    for (let i = 0; i < points.length; i++) {
+      context.lineTo(points[i].x + 300, points[i].y + 300);
+    }
+
+    context.closePath();
+    context.stroke();
+  }
+
+  function getRaderChartPoints(r, rates) {
+    const thetaUnit = Math.PI * 2 / rates.length
+    return rates.map((rate, i) => polarToXY(r * rate, thetaUnit * i))
+  }
+
+  /**
+  * @param {number} n: 正n角形
+  * @param {number} r: 正n角形の中心から頂点への距離
+  * @return Array<{x: number, y: number }>: 座標
+  */
+  function getRectanglePoints(n, r) {
+    // canvasに書かれる
+    const thetaUnit = Math.PI * 2 / n
+
+    const points = []
+
+    for (let i = 0; i < n; i++) {
+      points.push(polarToXY(r, thetaUnit * i))
+    }
+
+    return points
+  }
+
+  function polarToXY(r, theta) {
+    return {
+      x: r * Math.round(Math.cos(theta) * 1000) / 1000,
+      y: r * Math.round(Math.sin(theta) * 1000) / 1000
+    }
+  }
+  function reload(n) {
+    location.reload();
+    showRectangle(n);
+  }
+
+  </script>
+
+</head>
+<body onLoad="showRectangle(300)">
+  <h2>レーダーチャート</h2>
+  <button
+  style="float: left"
+  type="button"
+  onclick="reload(300)"
+  >
+  <p>
+    レーダーチャートを更新
+  </p>
+</button>
+<canvas id="challenge" width="700" height="700">
+  図形を表示するには、canvasタグをサポートしたブラウザが必要です。
+</canvas>
+
+</body>
+</html>
